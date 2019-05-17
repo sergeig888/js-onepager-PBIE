@@ -23,19 +23,15 @@
         var PBIEtoken = "[insert your token]";
 
         //TODO: replace with your report embed URL
-        //var embedUrl = "https://app.powerbi.com/reportEmbed?reportId=626e2e70-186c-48a4-81d2-660899f485f0&groupId=fc7dde22-4515-4655-8e6a-d61f8728b2d2";
-        //NOTE:WSV2:
-        //var embedUrl = "https://app.powerbi.com/reportEmbed?reportId=69d4bc5c-8b7f-4d21-871e-41838670a759&groupId=69d4bc5c-8b7f-4d21-871e-41838670a759";
-        //NOTE:WSV1
         var embedUrl = 'https://app.powerbi.com/reportEmbed?reportId=b14f6f29-c5a0-407a-ae06-5c1ae8642285&groupId=7bbb6481-4081-4b0e-97d8-b5085dbb85f4&$filter=babynames/Year eq 1900'; //babynames~2FYear%20eq%201900
-        //var embedUrl = "https://app.powerbi.com/reportEmbed?reportId=b14f6f29-c5a0-407a-ae06-5c1ae8642285&groupId=7bbb6481-4081-4b0e-97d8-b5085dbb85f4";
+        
         var reportId = GetQSParam("reportId", embedUrl);
 
         var loadCounter = 0;
 
         var errorTracker = "";
 
-        //added by SOG 5/4/2018 to embed a report
+        //added by SergeiG 5/4/2018 to embed a report
         function EmbedReport() {
 
             if (errorTracker.length != 0) return;            
