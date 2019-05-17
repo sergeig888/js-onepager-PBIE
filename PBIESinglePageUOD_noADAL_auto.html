@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <style>
+        body{
+            font-family: 'Segoe UI';            
+        }
+    </style>
+    <meta charset="utf-8" />
+    <title></title>
+        
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://cdn.rawgit.com/Microsoft/PowerBI-JavaScript/master/dist/powerbi.min.js" type="text/javascript"></script>
+    
+    <script>
+
+        //TODO: provide your PBIE token; it will be valid for 60 min only!
+        //1. Install Power BI PowerShell module https://docs.microsoft.com/en-us/powershell/power-bi/overview?view=powerbi-ps
+        //2. Login into Power BI with your test identity account credentials using Login-PowerBI command
+        //3. Put PBIE token on clipboard: Get-PowerBIAccessToken -AsString | % {$_.replace("Bearer ","").Trim()} | clip
+        //4. Paste PBIE token value below; remove 'Bearer ' from the beginning of the string if present
+        var PBIEtoken = "[insert your token]";
+
+        //TODO: replace with your report embed URL
+        //var embedUrl = "https://app.powerbi.com/reportEmbed?reportId=626e2e70-186c-48a4-81d2-660899f485f0&groupId=fc7dde22-4515-4655-8e6a-d61f8728b2d2";
+        //NOTE:WSV2:
+        //var embedUrl = "https://app.powerbi.com/reportEmbed?reportId=69d4bc5c-8b7f-4d21-871e-41838670a759&groupId=69d4bc5c-8b7f-4d21-871e-41838670a759";
+        //NOTE:WSV1
+        var embedUrl = 'https://app.powerbi.com/reportEmbed?reportId=b14f6f29-c5a0-407a-ae06-5c1ae8642285&groupId=7bbb6481-4081-4b0e-97d8-b5085dbb85f4&$filter=babynames/Year eq 1900'; //babynames~2FYear%20eq%201900
+        //var embedUrl = "https://app.powerbi.com/reportEmbed?reportId=b14f6f29-c5a0-407a-ae06-5c1ae8642285&groupId=7bbb6481-4081-4b0e-97d8-b5085dbb85f4";
+        var reportId = GetQSParam("reportId", embedUrl);
+
+        var loadCounter = 0;
+
+        var errorTracker = "";
+
+        //added by SOG 5/4/2018 to embed a report
+        function EmbedReport() {
+
+            if (errorTracker.length != 0) return;            
+
+            // Get models (models contains enums)
+            var models = window['powerbi-client'].models;
+
+            // Embed configuration is used to describe what and how to embed
+            // This object is used when calling powerbi.embed
+            // It can also include settings and options such as filters
+            // See java script documentation on GitHub for settings value details
+            var config = {
+                type: 'report',
+                tokenType: models.TokenType.Aad,
+                accessToken: PBIEtoken,
+                embedUrl: embedUrl,
+                id: reportId,
+                settings: {
+                    filterPaneEnabled: true,
+                    navContentPaneEnabled: true                    
+                }
+            };
+            // Embed the report within the div element
+            var report = powerbi.embed(embedDiv, config);
+
+            //handling report load error
+            report.on("error", function (event) {
+                var divCounter = document.getElementById('LoadReportCounter');
+                var currentTime = new Date().toTimeString();
+                divCounter.innerHTML = divCounter.innerHTML
+                    + " [Error at " + currentTime + "] "
+                    + event.detail.detailedMessage + " "
+                    + event.detail.errorCode;
+
+                report.off("error");
+                //setting error tracker to stop the execution
+                errorTracker = event.detail.message;
+            });
+
+            //display report URL           
+            var taInfo = document.getElementById('ReportURL');
+            taInfo.value = embedUrl;
+            //display PBIE token
+            var divToken = document.getElementById('ADALToken');
+            divToken.value = PBIEtoken;
+            //display counter
+            loadCounter++;
+            var divCounter = document.getElementById('LoadReportCounter');
+            divCounter.innerHTML = loadCounter;
+        } 
+
+        //NOTE: can do report.reload() or report.refresh()
+        window.setInterval("EmbedReport();", 3000);
+
+        //TODO: add timer based cycler here; refresh or reload as option
+
+        //REGION: helper functions
+        //NOTE: helper function to extract qs parameter by name
+        function GetQSParam (name,url) {
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)')
+                .exec(url);
+            if (results == null) {
+                return 0;
+            }
+            return results[1] || 0;
+        }
+
+        //END REGION: helper functions
+
+    </script>
+
+</head>
+<body>
+
+    <div id="LoadReportCounter">0</div>
+    <div id="InfoMessage" style="font-weight:bolder;">Report URL and AAD token:</div>
+    <textarea id="ReportURL" wrap="soft" rows="1" readonly style="width:99%;resize:vertical;"></textarea>
+    <textarea id="ADALToken" wrap="soft" rows="3" readonly style="width:99%;resize:vertical;"></textarea>
+    <hr style="width:99%;" />
+    <div id="embedDiv" style="height: 600px; width: 100%; max-width: 1000px;" />
+
+</body>
+</html>
