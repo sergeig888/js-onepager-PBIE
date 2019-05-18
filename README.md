@@ -16,7 +16,7 @@ This code sample demonstrates how to create single page HTML+JavaScript only Pow
 ```html
 $filter=babynames/Year eq 1900
 ````
-git logThis extra step may be important because initial report load query result will be cached and subsequent report renders will not be hitting the backend if the DAX query from the UI layer remains unchanged. More information on query string filters can be found [here](https://powerbi.microsoft.com/en-us/blog/power-bi-report-url-filter-improvements/).
+This extra step may be important because initial report load query result will be cached and subsequent report renders will not be hitting the backend if the DAX query from the UI layer remains unchanged. More information on query string filters can be found [here](https://powerbi.microsoft.com/en-us/blog/power-bi-report-url-filter-improvements/).
 
 ### Background
 
