@@ -12,11 +12,13 @@ This code sample demonstrates how to create single page HTML+JavaScript only Pow
 2. The use of Power BI PowerShell module commandlet to obtain the PBIE token removes the need to register AAD app.
 3. This sample has a loop to simulate report reload activity by the user. Developer should adjust time span to allow desired report to fully render. This value will vary depending on particular report setup.
 4. It leverages Power BI client side javascript error handling to provide better insights into what may have gone wrong during the run.
-5. This sample can be easily extended. E.g., developer can add query string `$filter` parameter that if changed on each report render (NOTE: not included in this sample; requires adding more javascript code) could help in simulating load on the backend cores of your dedciated PBIE capacity. E.g., adding explicit year value will look like this: 
+5. Developer can add query string `$filter` parameter to the embed url that if changed in the html file could help in simulating load on the backend cores of your dedicated PBIE capacity. E.g., adding explicit year value will look like this:
+
 ```html
 $filter=babynames/Year eq 1900
 ````
-This extra step may be important because initial report load query result will be cached and subsequent report renders will not be hitting the backend if the DAX query from the UI layer remains unchanged. More information on query string filters can be found [here](https://powerbi.microsoft.com/en-us/blog/power-bi-report-url-filter-improvements/).
+
+Initial report load query result will be cached and subsequent report renders will not be hitting the backend if the DAX query from the UI layer remains unchanged. More information on query string filters can be found [here](https://powerbi.microsoft.com/en-us/blog/power-bi-report-url-filter-improvements/). Developer can add report filters to the configuration object or use set report [filters](https://github.com/Microsoft/PowerBI-JavaScript/wiki/Filters) or slicers javascript functions if there is a need to focus on the backend load by programmatically updating UI generated DAX queries.
 
 ### Background
 
