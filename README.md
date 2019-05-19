@@ -18,7 +18,37 @@ This code sample demonstrates how to create single page HTML+JavaScript only Pow
 $filter=babynames/Year eq 1900
 ````
 
-Initial report load query result will be cached and subsequent report renders will not be hitting the backend if the DAX query from the UI layer remains unchanged. More information on query string filters can be found [here](https://powerbi.microsoft.com/en-us/blog/power-bi-report-url-filter-improvements/). Developer can add report filters to the configuration object or use set report [filters](https://github.com/Microsoft/PowerBI-JavaScript/wiki/Filters) or slicers javascript functions if there is a need to focus on the backend load by programmatically updating UI generated DAX queries.
+Important to note that the initial report load query result will be cached and subsequent report renders will not be hitting the backend if the DAX query from the UI layer remains unchanged. More information on query string filters can be found [here](https://powerbi.microsoft.com/en-us/blog/power-bi-report-url-filter-improvements/).
+
+Developer can add report filter to the configuration object or use set report [filters](https://github.com/Microsoft/PowerBI-JavaScript/wiki/Filters) or slicers javascript functions if there is a need to focus on the backend load by programmatically updating UI generated DAX queries. Here is an example of changes that could be applied to the one pager to leverage report filter to generate different DAX query for each new render:
+```javascript
+...
+//seeding initial filter value  
+var startYear=1900;
+
+function EmbedReport() {
+...    
+    //configuring report level filter to simulate load on the backend core
+    var filter = {
+              $schema: "http://powerbi.com/product/schema#basic",
+                target: {
+                table: "babynames",
+                column: "Year"
+                },
+                    operator: "In",
+                    values: [startYear]
+        };
+
+    //incrementing filter value; restarting when hit numeric filter max
+    startYear = startYear < 2019 ? ++startYear : 1900;
+    ...
+    var config = {
+           ...
+           filters: [filter],
+           ...
+    };
+```
+NOTE: If you are using imported data model these queries can be traced in the SQL Profiler using XMLA endpoint. See "Power BI XMLA endpoint public preview" announcement [blog post](https://powerbi.microsoft.com/en-us/blog/power-bi-open-platform-connectivity-with-xmla-endpoints-public-preview/) for details.
 
 ### Background
 
