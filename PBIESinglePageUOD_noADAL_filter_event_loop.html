@@ -12,7 +12,7 @@
         
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="https://cdn.rawgit.com/Microsoft/PowerBI-JavaScript/master/dist/powerbi.min.js" type="text/javascript"></script>
-    
+        
     <script>
 
         //TODO: provide your PBIE token; it will be valid for 60 min only!
@@ -23,14 +23,18 @@
         var PBIEtoken = "[insert your token]";
 
         //TODO: replace with your report embed URL
+        //Get proper report embed URL using PS: Get-PowerBIReport -Id [report GUID] -WorkspaceId [workspace GUID] | Select -ExpandProperty EmbedUrl | Clip
         var embedUrl = 'https://app.powerbi.com/reportEmbed?reportId=b14f6f29-c5a0-407a-ae06-5c1ae8642285&groupId=7bbb6481-4081-4b0e-97d8-b5085dbb85f4';
-
+        
         //TODO: replace with the seed filter value for your specific report filter 
         var startYear = 1900; //TODO: refactor to make more generic
 
-        var reportId = GetQSParam("reportId", embedUrl);
+        //TODO: adjust this value based on the complexity of your report; helps free up clogged browser resources
+        var sessionRestart = 100; //NOTE: added to address hard to identify long-running session memory leak
 
-        var loadCounter = 0;
+        var reportId = GetQSParam("reportId", embedUrl);
+        //preserving total report render count to support session restart flow
+        var loadCounter = sessionStorage.getItem('reloadCounter')=== null ? 0 : sessionStorage.getItem('reloadCounter');
 
         var errorTracker = "";
        
@@ -41,7 +45,7 @@
 
             if(errorTracker.length != 0) return;
 
-            if(report!=undefined) report.off("rendered");            
+            if(report!=undefined) report.off("rendered");
 
             // Get models (models contains enums)
             var models = window['powerbi-client'].models;
@@ -59,6 +63,7 @@
                     };
 
             //incrementing filter value; restarting if hit numeric filter max
+            //TODO: adjust value for your specific filter range
             startYear = startYear < 2019 ? ++startYear : 1900;            
 
             // Embed configuration is used to describe what and how to embed
@@ -102,11 +107,19 @@
             taInfo.value = embedUrl;
             //display PBIE token
             var divToken = document.getElementById('ADALToken');
-            divToken.value = PBIEtoken;
+            divToken.value = PBIEtoken;            
+
             //display counter
-            loadCounter++;            
+            loadCounter++;
+
             var divCounter = document.getElementById('LoadReportCounter');
-            divCounter.innerHTML = loadCounter;
+            divCounter.innerHTML = loadCounter;   
+
+            //NOTE: added 5/25/19 to see if helps address session memory leak issue
+            if((loadCounter % sessionRestart) === 0) {
+                sessionStorage.setItem('reloadCounter',loadCounter);
+                location.reload(false);
+            };           
         } 
 
         //NOTE: can use report.reload() or report.refresh()
