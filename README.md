@@ -60,3 +60,5 @@ Download [Power BI client side JavaScript library](https://github.com/Microsoft/
 
 I’ve put this sample together from the bits and pieces that I found in various documents, code samples and in comments on stackoverflow.com.
 
+**UPDATE [6/1/19]:** added PowerShellAutomation folder that contains PS and template html file to go with it that simplifies configuration process. PS file contains details and "how to" instructions.
+
