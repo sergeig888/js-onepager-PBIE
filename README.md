@@ -62,3 +62,18 @@ I’ve put this sample together from the bits and pieces that I found in various
 
 **UPDATE [6/1/19]:** added PowerShellAutomation folder that contains PS and template html file to go with it that simplifies configuration process. PS file contains details and "how to" instructions.
 
+**UPDATE [6/15/19]:**  project derived from my base code and ideas in this repo has been shared at 2019 Microsoft Business Applications Summit in Atlanta in several sessions as part of guidance for proper dedicated capacity sizing. 
+* MBAS 2019 session: "[Microsoft Power BI: Premium capacity - why use it, how to plan for it, evaluate your needs and adapt your PBI content to it](https://community.powerbi.com/t5/MBAS-Gallery/Microsoft-Power-BI-Premium-capacity-why-use-it-how-to-plan-for/m-p/712532)" has the best coverage. Tool demo starts at around 31 minute mark.
+* GitHub repo for [burst mode PowerShell script](https://github.com/samanthgunreddy/PBI_Report_LoadTesting) derived from this project. It is aimed at less technical audience.
+
+**UPDATE [2/7/20]:** There seems to be a problem with either the latest Chromium engine update or powerbi.js or both.  The issue has been escalated the PBIE team that owns powerbi.js library.
+
+There is a workaround:
+1)	Get October 15 2019 or earlier version of powerbi.js or powerbi.min.js library from [PBIE Javascript GitHub repo](https://github.com/microsoft/PowerBI-JavaScript/tree/master/dist) and copy it in the same folder as the page HTML file.
+2)	In the HTML file switch library reference from its cdn version to local:
+````javascript
+<!-- <script src="https://cdn.rawgit.com/Microsoft/PowerBI-JavaScript/master/dist/powerbi.min.js" type="text/javascript"></script> -->
+<script src="powerbi.min.js" type="text/javascript"></script>
+````
+
+Page will start loading and numeric filters will start iterating generating backend queries and traffic.

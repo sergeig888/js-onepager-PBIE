@@ -56,7 +56,23 @@
 
             if(errorTracker.length != 0) return;
 
-            if(report!=undefined) report.off("rendered");
+            if(report!=undefined) 
+            {
+                report.off("rendered");
+            }
+            else 
+            {
+                //added by SergeiG 6/4/2019; trying to work around session restart load counter issue
+                var divCounter = document.getElementById('LoadReportCounter');
+                divCounter.innerHTML = loadCounter; 
+
+                //display report URL           
+                var taInfo = document.getElementById('ReportURL');
+                taInfo.value = embedUrl;
+                //display PBIE token
+                var divToken = document.getElementById('ADALToken');
+                divToken.value = PBIEtoken;        
+            }
 
             // Get models (models contains enums)
             var models = window['powerbi-client'].models;
@@ -111,26 +127,24 @@
                 errorTracker = event.detail.message;
             });           
 
-            report.on("rendered",EmbedReport);
+            //NOTE: added by SergeiG 6/4/2019 to help with counter blinking on session reload
+            //report.on("rendered",EmbedReport);
+            report.on("rendered",function(event)
+            {
+                //NOTE: added 5/25/19 to see if helps address session memory leak issue
+                if((loadCounter % sessionRestart) === 0) {
+                    sessionStorage.setItem('reloadCounter',loadCounter);                
+                    location.reload(false);
+                };               
 
-            //display report URL           
-            var taInfo = document.getElementById('ReportURL');
-            taInfo.value = embedUrl;
-            //display PBIE token
-            var divToken = document.getElementById('ADALToken');
-            divToken.value = PBIEtoken;            
+                var divCounter = document.getElementById('LoadReportCounter');
+                divCounter.innerHTML = loadCounter;   
 
-            //display counter            
-            loadCounter++;
+                EmbedReport();
+            });                
 
-            var divCounter = document.getElementById('LoadReportCounter');
-            divCounter.innerHTML = loadCounter;   
-
-            //NOTE: added 5/25/19 to see if helps address session memory leak issue
-            if((loadCounter % sessionRestart) === 0) {
-                sessionStorage.setItem('reloadCounter',loadCounter);                
-                location.reload(false);
-            };           
+            //advancing counter            
+            loadCounter++;           
         } 
 
         //NOTE: can use report.reload() or report.refresh()
